@@ -109,8 +109,7 @@ full-factorial CO2 laser engraving experiment with the column schema documented 
 Place your dataset files as:
 
 ```
-data/data.csv     # used by gpr.py, svr.py, mlp.py, random_forest.py
-data/data2.csv    # variant dataset used by polynomial_ridge.py (same schema)
+data/data.csv     # used by all five models (gpr, svr, mlp, random_forest, polynomial_ridge)
 ```
 
 ### Running the models
@@ -122,7 +121,7 @@ python src/gpr.py                # GPR + conformal calibration + SHAP / PDP / IC
 python src/svr.py                # SVR baseline
 python src/mlp.py                # MLP baseline
 python src/random_forest.py      # Random Forest baseline
-python src/polynomial_ridge.py   # Polynomial Ridge baseline (reads data/data2.csv)
+python src/polynomial_ridge.py   # Polynomial Ridge baseline
 ```
 
 Each script runs the full multi-seed GWO experiment and prints per-seed metrics,
