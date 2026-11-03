@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Robust conformal Gaussian process regression for CO2 laser engraving: Distribution-free uncertainty quantification and automated quality gating"
+authors:
+  - family-names: Dey
+    given-names: Niloy
+  - family-names: Khan
+    given-names: Mohammad Muhshin Aziz
+  - family-names: Sayem
+    given-names: Ahmed
+type: article
+journal: "Expert Systems with Applications"
+volume: 333
+year: 2027
+doi: 10.1016/j.eswa.2026.134356
+repository-code: "https://github.com/nil0y-dey/CO2-Laser-engraving-PMMA"
+keywords:
+  - CO2 laser ablation process
+  - Surrogate modelling
+  - Gaussian process regression
+  - Uncertainty quantification
+  - Grey Wolf Optimizer
+  - Poly(methyl methacrylate)
+license: MIT
