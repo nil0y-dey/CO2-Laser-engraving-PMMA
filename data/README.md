@@ -8,8 +8,7 @@ groove geometry (width and depth).
 
 | File | Used by | Description |
 |---|---|---|
-| `data.csv` | `src/gpr.py`, `src/svr.py`, `src/mlp.py`, `src/random_forest.py` | 125-run full-factorial dataset |
-| `data2.csv` | `src/polynomial_ridge.py` | Variant dataset used for the polynomial ridge baseline (same schema) |
+| `data.csv` | all five models (`src/gpr.py`, `src/svr.py`, `src/mlp.py`, `src/random_forest.py`, `src/polynomial_ridge.py`) | 125-run full-factorial dataset |
 | `data_template.csv` | — | Column schema template |
 
 ## Column schema
