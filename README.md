@@ -188,5 +188,5 @@ This project is released under the [MIT License](LICENSE).
 
 ## Acknowledgements
 
-This work was carried out at the Department of Industrial and Production Engineering (IPE),
-Shahjalal University of Science and Technology.
+This work was carried out at the [Department of Industrial and Production Engineering (IPE),
+Shahjalal University of Science and Technology](https://www.sust.edu/index.php/departments/ipe).
