@@ -24,7 +24,7 @@ from pathlib import Path
 # headline numbers (R^2 = 0.999 depth / 0.998 width) bit-for-bit.
 # ---------------------------------------------------------------------------
 GWO_NUM_WOLVES = 12
-GWO_MAX_ITER   = 5
+GWO_MAX_ITER   = 25
 
 
 #GLOBAL DETERMINISM
