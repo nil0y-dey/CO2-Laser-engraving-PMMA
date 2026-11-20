@@ -13,6 +13,7 @@ from joblib import Parallel, delayed
 import random
 import os
 from pathlib import Path
+import argparse
 
 
 def set_global_determinism(seed=42):
@@ -73,7 +74,7 @@ def run_gwo_rf_pipeline(X_raw, y_raw, seed):
     fold_indices = list(kf.split(X_train_val))   # list of (train_idx, val_idx) tuples
 
     # GWO-LOOP
-    num_wolves, max_iter, dim = 12, 25, 4
+    num_wolves, max_iter, dim = GWO_NUM_WOLVES, GWO_MAX_ITER, 4
     lb = np.array([50,  3,  4, -4.0])
     ub = np.array([150, 8, 12, -2.0])   # n_estimator > max_depth > min_samples_split > ccp_alpha
 
@@ -285,8 +286,24 @@ def run_multi_seed_experiment_rf(df, seed_list, selection_mode):
 
 
 # Dataset: 125-run full-factorial CO2 laser engraving experiments (schema in data/README.md)
+# GWO budget (paper: 12 wolves x 25 iterations); override with --gwo-wolves / --max-iter
+GWO_NUM_WOLVES = 12
+GWO_MAX_ITER   = 25
+
 DATA_PATH = Path(__file__).resolve().parents[1] / 'data' / 'data.csv'
 
-df_main = pd.read_csv(DATA_PATH)
+parser = argparse.ArgumentParser(description='GWO-tuned Random Forest baseline')
+parser.add_argument('--data', type=Path, default=DATA_PATH,
+                    help='Path to the dataset CSV (default: data/data.csv)')
+parser.add_argument('--mode', choices=['s1', 's2', 's3', 's4'], default='s1',
+                    help='Input feature set (default: s1)')
+parser.add_argument('--gwo-wolves', type=int, default=GWO_NUM_WOLVES,
+                    help='GWO population size (default: 12)')
+parser.add_argument('--max-iter', type=int, default=GWO_MAX_ITER,
+                    help='GWO iterations (default: 25)')
+args = parser.parse_args()
+GWO_NUM_WOLVES, GWO_MAX_ITER = args.gwo_wolves, args.max_iter
+
+df_main = pd.read_csv(args.data)
 seeds = [405, 166, 327, 347, 589]
-raw_df, summary_df = run_multi_seed_experiment_rf(df_main, seeds, 's1')
+raw_df, summary_df = run_multi_seed_experiment_rf(df_main, seeds, args.mode)

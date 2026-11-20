@@ -13,6 +13,7 @@ import os
 import shap
 import matplotlib.gridspec as gridspec
 from pathlib import Path
+import argparse
 
 
 
@@ -998,28 +999,50 @@ feature_map = {
 # Dataset: 125-run full-factorial CO2 laser engraving experiments (schema in data/README.md)
 DATA_PATH = Path(__file__).resolve().parents[1] / 'data' / 'data.csv'
 
-df_main = pd.read_csv(DATA_PATH)
+parser = argparse.ArgumentParser(description='GWO-tuned, conformal-calibrated GPR')
+parser.add_argument('--data', type=Path, default=DATA_PATH,
+                    help='Path to the dataset CSV (default: data/data.csv)')
+parser.add_argument('--mode', choices=['s1', 's2', 's3', 's4'], default='s1',
+                    help='Input feature set (default: s1)')
+parser.add_argument('--gwo-wolves', type=int, default=GWO_NUM_WOLVES,
+                    help='GWO population size (default: 12)')
+parser.add_argument('--max-iter', type=int, default=GWO_MAX_ITER,
+                    help='GWO iterations (default: 25)')
+parser.add_argument('--downsample', type=float, default=1.0,
+                    help='Fraction of the training partition to keep, e.g. 0.5 or 0.25 (default: 1.0)')
+parser.add_argument('--noise-level', type=float, default=0.0,
+                    help='Gaussian input noise as a fraction of per-feature std, e.g. 0.05 or 0.10 (default: 0 = off)')
+args = parser.parse_args()
+GWO_NUM_WOLVES, GWO_MAX_ITER = args.gwo_wolves, args.max_iter
+
+df_main = pd.read_csv(args.data)
 seeds = [405, 166, 327, 347, 589]
-selection_mode = 's1'
+selection_mode = args.mode
 
 print("#####################################################")
 print("# 1. RUNNING BASELINE 100% DATA                     #")
 print("#####################################################")
 all_results_df_100, summary_100, seed42_models, X_train_val, X_test, X_f, y_f = run_multi_seed_experiment_gpr_separate(
-    df_main, seeds, selection_mode, downsample_fraction=1.0, noise_test=False
+    df_main, seeds, selection_mode,
+    downsample_fraction=args.downsample,
+    noise_test=args.noise_level > 0,
+    noise_level=args.noise_level
 )
 
 
 
 
-shap_results = run_gpr_shap_pdp_ice(
-    seed42_models  = seed42_models,
-    X_train_val    = X_train_val,
-    X_test         = X_test,
-    feature_names  = feature_map[selection_mode],
-    selection_mode = selection_mode,
-    n_background   = 50,    # K-means centers
-    n_samples      = 200,   # increase to 500 for final paper figures
-    n_ice          = 20,    # ICE lines per plot
-    n_grid         = 50     # PDP sweep points
-)
+# SHAP / PDP / ICE needs the full-data, noise-free reference-seed models,
+# which are only kept when --downsample 1.0 and --noise-level 0.
+if seed42_models is not None:
+    shap_results = run_gpr_shap_pdp_ice(
+        seed42_models  = seed42_models,
+        X_train_val    = X_train_val,
+        X_test         = X_test,
+        feature_names  = feature_map[selection_mode],
+        selection_mode = selection_mode,
+        n_background   = 50,    # K-means centers
+        n_samples      = 200,   # increase to 500 for final paper figures
+        n_ice          = 20,    # ICE lines per plot
+        n_grid         = 50     # PDP sweep points
+    )

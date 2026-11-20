@@ -13,6 +13,7 @@ from scipy.stats import probplot
 import random
 import os
 from pathlib import Path
+import argparse
 
 
 
@@ -66,7 +67,7 @@ def run_gwo_svr_pipeline(X_raw, y_raw, seed):
         return np.mean(fold_errors)
 
     # GWO LOOP
-    num_wolves, max_iter, dim = 12, 25, 3
+    num_wolves, max_iter, dim = GWO_NUM_WOLVES, GWO_MAX_ITER, 3
     lb = np.array([-1.0, -4.0, -4.0])   
     ub = np.array([ 2.0, -1.0, -1.0])   
 
@@ -285,8 +286,24 @@ def run_multi_seed_experiment_svr(df, seed_list, selection_mode):
 
 
 # Dataset: 125-run full-factorial CO2 laser engraving experiments (schema in data/README.md)
+# GWO budget (paper: 12 wolves x 25 iterations); override with --gwo-wolves / --max-iter
+GWO_NUM_WOLVES = 12
+GWO_MAX_ITER   = 25
+
 DATA_PATH = Path(__file__).resolve().parents[1] / 'data' / 'data.csv'
 
-df_main = pd.read_csv(DATA_PATH)
+parser = argparse.ArgumentParser(description='GWO-tuned SVR baseline')
+parser.add_argument('--data', type=Path, default=DATA_PATH,
+                    help='Path to the dataset CSV (default: data/data.csv)')
+parser.add_argument('--mode', choices=['s1', 's2', 's3', 's4'], default='s1',
+                    help='Input feature set (default: s1)')
+parser.add_argument('--gwo-wolves', type=int, default=GWO_NUM_WOLVES,
+                    help='GWO population size (default: 12)')
+parser.add_argument('--max-iter', type=int, default=GWO_MAX_ITER,
+                    help='GWO iterations (default: 25)')
+args = parser.parse_args()
+GWO_NUM_WOLVES, GWO_MAX_ITER = args.gwo_wolves, args.max_iter
+
+df_main = pd.read_csv(args.data)
 seeds = [405, 166, 327, 347, 589]
-raw_df, summary_df, seed42_svr, X_f_svr, y_f_svr = run_multi_seed_experiment_svr(df_main, seeds, 's1')
+raw_df, summary_df, seed42_svr, X_f_svr, y_f_svr = run_multi_seed_experiment_svr(df_main, seeds, args.mode)
