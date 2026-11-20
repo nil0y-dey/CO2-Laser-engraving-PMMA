@@ -140,6 +140,30 @@ python src/gwo_sensitivity.py    # GWO budget sensitivity analysis
 python src/quality_gating.py     # quality-gating validation on held-out data
 ```
 
+The five model scripts accept command-line arguments; with no arguments they run
+the paper's configuration:
+
+| Argument | Scripts | Default | Description |
+|---|---|---|---|
+| `--data PATH` | all five models | `data/data.csv` | Path to the dataset CSV |
+| `--mode {s1,s2,s3,s4}` | all five models | `s1` | Input feature set (see below) |
+| `--gwo-wolves N` | all five models | `12` | GWO population size |
+| `--max-iter N` | all five models | `25` | GWO iterations |
+| `--downsample F` | `gpr.py` | `1.0` | Fraction of the training partition to keep (paper: `0.5`, `0.25`) |
+| `--noise-level F` | `gpr.py` | `0` (off) | Gaussian input noise as a fraction of per-feature std (paper: `0.05`, `0.10`) |
+
+Examples:
+
+```bash
+python src/gpr.py --mode s3                    # GPR on feature set S3
+python src/gpr.py --downsample 0.25            # data-scarcity study (25% training data)
+python src/gpr.py --noise-level 0.10           # sensor-noise study (10% input noise)
+python src/svr.py --mode s2 --max-iter 10      # SVR on S2 with a smaller GWO budget
+```
+
+SHAP / PDP / ICE analysis in `gpr.py` runs only for the full-data, noise-free
+configuration.
+
 Each script runs the full multi-seed GWO experiment and prints per-seed metrics,
 pooled residual statistics, and a mean ± std summary over all seeds. GPR additionally
 performs conformal calibration (PICP / NLPD) and the SHAP + PDP/ICE interpretability
@@ -148,8 +172,7 @@ analysis. Generated CSV tables and figures are written to `results/` (see
 
 ### Feature selection modes
 
-The active feature set is controlled by the `selection_mode` variable at the bottom of
-each script:
+The active feature set is selected with `--mode` (default `s1`):
 
 | Mode | Features | Description |
 |---|---|---|
@@ -158,10 +181,7 @@ each script:
 | `s3` | Speed, Defocus length, Area ED | Hybrid raw + composite |
 | `s4` | Defocus length, Linear ED, Area ED | Alternative hybrid subset |
 
-Additional experiment knobs available at the bottom of each script: the seed list
-(`seeds`), and in `gpr.py` the downsampling and noise-robustness options
-(`downsample_fraction`, `noise_test`, `noise_level`) used for the data-efficiency and
-noise-sensitivity studies in the paper.
+The seed list (`seeds = [405, 166, 327, 347, 589]`) is set at the bottom of each script.
 
 ## Citation
 
