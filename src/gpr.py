@@ -263,8 +263,7 @@ def run_single_task_pipeline(X_train_val, X_test,
     
     cv_std_resid = np.abs(cv_resid / (cv_sigma + 1e-8))
     conformal_quantile = float(np.quantile(cv_std_resid, 0.95))
-    scale_factor = (conformal_quantile / 1.96) * 1.05  # Divide by 1.96 so it applies correctly to the 1.96*sigma bounds
-    
+    scale_factor = (conformal_quantile / 1.96)     
 
     print(f"  [{task_name}] CV-based Conformal Scale Factor: {scale_factor:.4f}")
 
